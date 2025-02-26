@@ -9,7 +9,6 @@ profileRouter.get('/profile/:userType', selectAuthMiddleware, async(req, res)=>{
         res.send(user);
     }
     catch(err){
-        console.log(err);
         res.status(400).send("There is some error"+ err);
     }
 })

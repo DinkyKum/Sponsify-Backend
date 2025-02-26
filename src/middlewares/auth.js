@@ -26,16 +26,13 @@ const sponsorAuth= async (req, res, next)=>{
 
 const organizerAuth= async (req, res, next)=>{
     try{
-        console.log("organizerAuth")
     const {token}=req.cookies;
     if(!token){
         return res.status(401).send("Kindly Login")
     }
     const decodedData= jwt.verify(token, process.env.JWT_SECRET);
     const {_id}=decodedData;
-    console.log(_id);
 
-   
     const user= await Organizer.findById(_id);
 
     if(!user){
@@ -51,7 +48,6 @@ const organizerAuth= async (req, res, next)=>{
 
 
 const selectAuthMiddleware = (req, res, next) => {
-    console.log("Reached Here");
     const { userType } = req.params;
     
 

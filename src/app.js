@@ -3,7 +3,8 @@ const app = express()
 const connectDB=require('./config/db')
 const cookieParser=require('cookie-parser');
 const authRouter=require('./Routes/auth');
-const profileRouter=require('./routes/profile')
+const profileRouter=require('./routes/profile');
+const organizerRouter=require('./routes/organizer');
 
 require('dotenv').config();
 const PORT = process.env.PORT
@@ -22,4 +23,5 @@ connectDB().then(() => {
 });
 
 app.use('/', authRouter);
-app.use('/', profileRouter)
+app.use('/', profileRouter);
+app.use('/', organizerRouter);
