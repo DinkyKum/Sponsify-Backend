@@ -32,7 +32,7 @@ authRouter.post('/signup/:userType', async (req, res)=>{
       }
       const token= await user.getJWT();
       res.cookie("token", token);
-      res.json({message: `${userType} Added Successfully`})
+      res.json({message: `${userType} Added Successfully`, data:user})
      } 
   
      catch(err){

@@ -45,7 +45,7 @@ const organizerSchema= new mongoose.Schema({
 
     logo:{
         type:String,
-        default: "https://cdn-icons-png.flaticon.com/256/149/149071.png",
+        default: "https://www.shutterstock.com/image-vector/no-image-available-picture-coming-600nw-2057829641.jpg",
         validate(value){
             if(!validator.isURL(value)){
                 throw new Error("Enter a valid URL");
