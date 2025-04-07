@@ -54,7 +54,7 @@ const sponsorSchema= new mongoose.Schema({
 
 
     methods:{
-        type: [Boolean],
+        type: [String],
         maxLength: 5,
     },
 
@@ -73,6 +73,11 @@ const sponsorSchema= new mongoose.Schema({
         type: String,
         default: "This is the default about data"
     },
+
+    events:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref: 'Event'
+    }
 
 }
 )

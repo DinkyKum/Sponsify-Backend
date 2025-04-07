@@ -5,6 +5,8 @@ const cookieParser=require('cookie-parser');
 const authRouter=require('./Routes/auth');
 const profileRouter=require('./routes/profile');
 const organizerRouter=require('./routes/organizer');
+const eventRouter=require('./routes/event');
+const sponsorRouter=require('./routes/sponsor');
 const cors=require('cors')
 
 require('dotenv').config();
@@ -32,3 +34,5 @@ connectDB().then(() => {
 app.use('/', authRouter);
 app.use('/', profileRouter);
 app.use('/', organizerRouter);
+app.use('/', eventRouter);
+app.use('/', sponsorRouter);

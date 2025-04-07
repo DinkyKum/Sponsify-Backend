@@ -40,7 +40,8 @@ const organizerSchema= new mongoose.Schema({
     },
 
     events:{
-        type:[String]
+        type:[mongoose.Schema.Types.ObjectId],
+        ref: 'Event'
     },
 
     logo:{
