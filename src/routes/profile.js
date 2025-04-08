@@ -2,6 +2,7 @@ const express= require('express');
 const profileRouter=express.Router();
 const {validateSponsorEditData, validateOrganizerEditData}= require('../utils/Validations');
 const {selectAuthMiddleware}=require('../middlewares/auth')
+const Investment= require('../models/investment');
 
 profileRouter.get('/profile/:userType', selectAuthMiddleware, async(req, res)=>{
     try{
@@ -33,6 +34,46 @@ profileRouter.put('/profile/edit/:userType', selectAuthMiddleware, async(req, re
         res.status(400).send("There is some error"+ err);
     }
 })
+
+profileRouter.get('/myInvestments', async (req, res) => {
+    try {
+      const user = req.user; // assuming user is attached to req via middleware
+  
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+  
+      let investments;
+  
+      // If user is an organizer/company
+      if (user.role === 'organizer') {
+        // Find events organized by this user
+        const organizerEvents = await Event.find({ organizer: user._id }).select('_id');
+  
+        const eventIds = organizerEvents.map(event => event._id);
+  
+        // Find investments into those events
+        investments = await Investment.find({ event: { $in: eventIds } })
+          .populate('event')
+          .populate('sponsor');
+  
+      } else if (user.role === 'sponsor') {
+        // If user is a sponsor, return their own investments
+        investments = await Investment.find({ sponsor: user._id })
+          .populate('event')
+          .populate('sponsor');
+      } else {
+        return res.status(403).json({ message: "Access denied" });
+      }
+  
+      res.status(200).json(investments);
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("There is some error: " + err.message);
+    }
+  });
+  
 
 
 module.exports=profileRouter;

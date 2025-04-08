@@ -14,9 +14,9 @@ organizerRouter.get('/viewOrganizers', async(req, res)=>{
     }
 })
 
-organizerRouter.get('/organizer', organizerAuth, async (req, res) => {
+organizerRouter.get('/organizer/:id', async (req, res) => {
     try {
-        const organizerId = req.user._id;
+        const organizerId = req.params.id;
 
         const organizer = await Organizer.findById(organizerId)
             .populate('events') 

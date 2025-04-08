@@ -15,9 +15,9 @@ sponsorRouter.get('/viewSponsors', async(req, res)=>{
     }
 })
 
-sponsorRouter.get('/sponsor', sponsorAuth, async(req, res)=>{
+sponsorRouter.get('/sponsor/:id', async(req, res)=>{
     try {
-            const sponsorId = req.user._id;
+            const sponsorId = req.params.id;
             const sponsor = await Sponsor.findById(sponsorId)
                 .populate('events') 
                 .exec();

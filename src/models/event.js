@@ -23,16 +23,10 @@ const eventSchema= new mongoose.Schema({
     date:{
         type: Date,
         required: true,
-        validate(value){
-            if(value<new Date()){
-                throw new Error("Event date cannot be in the past");
-            }
-        }
     },
 
     budget:{
-        type:[Number],
-        maxLength:2,
+        type:Number,
     },
 
     eventType:{

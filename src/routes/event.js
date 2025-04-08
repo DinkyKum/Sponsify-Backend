@@ -17,7 +17,7 @@ eventRouter.get('/viewEvents', async(req, res)=>{
 
 eventRouter.get('/event/:id', async(req, res)=>{
     try{
-        const eventDetails=await Event.findById(req.params.id);
+        const eventDetails=await Event.findById(req.params.id).populate('organizer sponsors');
         res.send(eventDetails);
     }
     catch(err){
