@@ -3,6 +3,7 @@ const profileRouter=express.Router();
 const {validateSponsorEditData, validateOrganizerEditData}= require('../utils/Validations');
 const {selectAuthMiddleware}=require('../middlewares/auth')
 const Investment= require('../models/investment');
+const Event= require('../models/event');
 
 profileRouter.get('/profile/:userType', selectAuthMiddleware, async(req, res)=>{
     try{
@@ -35,9 +36,10 @@ profileRouter.put('/profile/edit/:userType', selectAuthMiddleware, async(req, re
     }
 })
 
-profileRouter.get('/myInvestments', async (req, res) => {
+profileRouter.get('/myDeals/:userType', selectAuthMiddleware, async (req, res) => {
     try {
-      const user = req.user; // assuming user is attached to req via middleware
+      const user = req.user;
+      const userType = req.params.userType; // "sponsor" or "organizer"
   
       if (!user) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -45,34 +47,44 @@ profileRouter.get('/myInvestments', async (req, res) => {
   
       let investments;
   
-      // If user is an organizer/company
-      if (user.role === 'organizer') {
-        // Find events organized by this user
+      if (userType === 'organizer') {
         const organizerEvents = await Event.find({ organizer: user._id }).select('_id');
-  
         const eventIds = organizerEvents.map(event => event._id);
   
-        // Find investments into those events
         investments = await Investment.find({ event: { $in: eventIds } })
-          .populate('event')
+          .populate({
+            path: 'event',
+            populate: {
+              path: 'organizer',
+              model: 'Organizer', // or your Organizer model
+            }
+          })
           .populate('sponsor');
   
-      } else if (user.role === 'sponsor') {
-        // If user is a sponsor, return their own investments
+      } else if (userType === 'sponsor') {
         investments = await Investment.find({ sponsor: user._id })
-          .populate('event')
+          .populate({
+            path: 'event',
+            populate: {
+              path: 'organizer',
+              model: 'Organizer',
+            }
+          })
           .populate('sponsor');
+  
       } else {
         return res.status(403).json({ message: "Access denied" });
       }
   
       res.status(200).json(investments);
-  
     } catch (err) {
       console.error(err);
       res.status(500).send("There is some error: " + err.message);
     }
   });
+  
+  
+  
   
 
 

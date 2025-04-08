@@ -34,8 +34,7 @@ const eventSchema= new mongoose.Schema({
     },
 
     attendees:{
-        type:[Number],
-        maxLength:2,
+        type:Number
     },
 
 

@@ -35,36 +35,49 @@ sponsorRouter.get('/sponsor/:id', async(req, res)=>{
 
 sponsorRouter.post('/invest/:id', sponsorAuth, async (req, res) => {
     try {
-        const eventId = req.params.id;
-        const sponsorId = req.user._id;
-        const { description, methods } = req.body;
-
-        const investment = new Investment({
-            sponsor: sponsorId,
-            description,
-            methods,
-            event: eventId
-        });
-
-        await investment.save();
-
-        await Sponsor.findByIdAndUpdate(
-            sponsorId,
-            { $addToSet: { events: eventId } }, // prevents duplicate entries
-            { new: true }
-        );
-
-        await Event.findByIdAndUpdate(
-            eventId,
-            { $addToSet: { sponsors: sponsorId } }, // prevents duplicate entries
-            { new: true }
-        );
-
-        res.status(201).send(investment);
+      const eventId = req.params.id;
+      const sponsorId = req.user._id;
+      const { description, methods } = req.body;
+  
+      // Step 1: Check if this sponsor already invested in this event
+      const existingInvestment = await Investment.findOne({
+        sponsor: sponsorId,
+        event: eventId
+      });
+  
+      if (existingInvestment) {
+        return res.status(400).json({ message: 'You have already sponsored this event.' });
+      }
+  
+      // Step 2: Create new investment
+      const investment = new Investment({
+        sponsor: sponsorId,
+        description,
+        methods,
+        event: eventId
+      });
+  
+      await investment.save();
+  
+      // Step 3: Update sponsor and event references
+      await Sponsor.findByIdAndUpdate(
+        sponsorId,
+        { $addToSet: { events: eventId } },
+        { new: true }
+      );
+  
+      await Event.findByIdAndUpdate(
+        eventId,
+        { $addToSet: { sponsors: sponsorId } },
+        { new: true }
+      );
+  
+      res.status(201).send(investment);
     } catch (err) {
-        res.status(400).send("There is some error: " + err);
+      console.error('Investment Error:', err);
+      res.status(500).send('There is some error: ' + err.message);
     }
-});
-
+  });
+  
 
 module.exports=sponsorRouter;

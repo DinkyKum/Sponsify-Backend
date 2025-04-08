@@ -40,38 +40,44 @@ authRouter.post('/signup/:userType', async (req, res)=>{
      }
   })
   
-authRouter.post('/login', async(req, res)=>{
-      try{
-        
-          const {emailId, password}= req.body;
-          
-          let user= await Sponsor.findOne({emailId: emailId});
-          
-          if(user==null){
-            user= await Organizer.findOne({emailId: emailId});
-          }
-
-          if(!user){
-              throw new Error("Invalid Credentials")
-          }
-          const isPasswordValid= await user.validatePassword(password);
-
+  authRouter.post('/login', async (req, res) => {
+    try {
+      const { emailId, password } = req.body;
   
-          if(isPasswordValid){
-              const token= await user.getJWT();
+      let user = await Sponsor.findOne({ emailId: emailId });
+      let role = "sponsor";
   
-              res.cookie("token", token);
-              res.send(user);
-          }
-  
-          else{
-              throw new Error("Invalid Credentials")
-          }
+      if (user == null) {
+        user = await Organizer.findOne({ emailId: emailId });
+        role = "organizer";
       }
-      catch(err){
-          res.status(400).send("There is some error" + err);
+  
+      if (!user) {
+        throw new Error("Invalid Credentials");
       }
-  })
+  
+      const isPasswordValid = await user.validatePassword(password);
+  
+      if (isPasswordValid) {
+        const token = await user.getJWT();
+  
+        res.cookie("token", token);
+  
+        // Convert Mongoose doc to plain JS object, then spread and add role
+        const userData = {
+          ...user.toObject(),
+          role,
+        };
+  
+        res.send(userData);
+      } else {
+        throw new Error("Invalid Credentials");
+      }
+    } catch (err) {
+      res.status(400).send("There is some error: " + err.message);
+    }
+  });
+  
 
 authRouter.post('/logout', async(req, res)=>{
     res.cookie("token", null, {expires: new Date(Date.now())});
