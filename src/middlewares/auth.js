@@ -61,3 +61,5 @@ const selectAuthMiddleware = (req, res, next) => {
 };
 
 module.exports={sponsorAuth, organizerAuth, selectAuthMiddleware}
+
+
